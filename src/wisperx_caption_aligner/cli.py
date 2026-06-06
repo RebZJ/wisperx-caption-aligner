@@ -17,6 +17,7 @@ from .aligner import (
     tokens_to_debug,
 )
 from .config import load_config
+from .editor_server import serve_editor
 from .io import cache_root, convert_to_wav, read_lyrics, wav_duration_ms, write_json
 from .runner import run_whisperx_worker
 from .setup_env import configure_venv, default_venv_path, ensure_venv, install_heavy_dependencies
@@ -64,6 +65,18 @@ def build_parser() -> argparse.ArgumentParser:
     )
     align.add_argument("--venv-path", type=Path, help="Override configured WhisperX virtualenv path.")
     align.add_argument("--cache-dir", type=Path, help="Working cache directory for WAV and WhisperX JSON.")
+
+    editor = subparsers.add_parser("editor", help="Open a visual audio/caption timeline editor.")
+    editor.add_argument("--audio", type=Path, required=True, help="Audio file to play while editing.")
+    editor.add_argument("--captions", type=Path, required=True, help="Caption JSON to load.")
+    editor.add_argument(
+        "--out",
+        type=Path,
+        help="Where edited captions are saved. Defaults to overwriting --captions.",
+    )
+    editor.add_argument("--host", default="127.0.0.1", help="Host for the local editor server.")
+    editor.add_argument("--port", type=int, default=8765, help="Port for the local editor server. Use 0 for any port.")
+    editor.add_argument("--no-open", action="store_true", help="Print the URL instead of opening a browser.")
 
     return parser
 
@@ -206,6 +219,20 @@ def align_command(args: argparse.Namespace) -> int:
     return 0
 
 
+def editor_command(args: argparse.Namespace) -> int:
+    captions_path = args.captions.expanduser().resolve()
+    output_path = args.out.expanduser().resolve() if args.out else captions_path
+    serve_editor(
+        audio_path=args.audio,
+        captions_path=captions_path,
+        output_path=output_path,
+        host=args.host,
+        port=args.port,
+        open_browser=not args.no_open,
+    )
+    return 0
+
+
 def print_cache_notes() -> None:
     print("\nHeavy/cache locations to know about:")
     print("- Config: ~/.config/wisperx-caption-aligner/config.json")
@@ -225,6 +252,8 @@ def main(argv: list[str] | None = None) -> int:
             return setup_command(args)
         if args.command == "align":
             return align_command(args)
+        if args.command == "editor":
+            return editor_command(args)
     except KeyboardInterrupt:
         print("\nCancelled.", file=sys.stderr)
         return 130

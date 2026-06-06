@@ -13,6 +13,7 @@ It writes Remotion-compatible `Caption[]` JSON, while keeping the heavy WhisperX
 - Writes raw WhisperX transcript captions for debugging.
 - Writes canonical lyric-aligned captions for karaoke/lyric video workflows.
 - Writes a debug report with raw words, matched tokens, interpolation sources, and paths.
+- Opens a local visual caption editor with waveform playback, a scrubber, draggable caption blocks, group selection, and nudging.
 - Uses macOS `afconvert` for audio conversion when available, otherwise uses `ffmpeg`.
 
 ## Install
@@ -124,6 +125,37 @@ Caption JSON matches Remotion's `Caption[]` shape:
 
 Canonical captions keep your lyric words exactly as written. Raw captions use WhisperX's transcription words.
 
+## Fine tune captions visually
+
+After alignment, open the local timeline editor:
+
+```bash
+wisperx-caption-aligner editor \
+  --audio song.mp3 \
+  --captions alignments/song.captions.json
+```
+
+By default, Save overwrites the caption file you opened. To write to a new file:
+
+```bash
+wisperx-caption-aligner editor \
+  --audio song.mp3 \
+  --captions alignments/song.captions.json \
+  --out alignments/song.captions.edited.json
+```
+
+The editor runs as a local browser app. It includes:
+
+- audio playback with a live scrubber,
+- waveform view for spotting vocal starts and transients,
+- captions loaded as editable timeline blocks,
+- click or shift-click selection,
+- drag selection to move a group together,
+- drag an empty area to marquee-select multiple captions,
+- left/right resize handles for timing a word edge,
+- nudge controls for moving selected captions by exact milliseconds,
+- Save to write the JSON file and Export to download a copy.
+
 ## Cache locations
 
 The tool never deletes caches automatically.
@@ -144,6 +176,7 @@ pytest
 wisperx-caption-aligner --help
 wisperx-caption-aligner setup --help
 wisperx-caption-aligner align --help
+wisperx-caption-aligner editor --help
 ```
 
 CI runs lightweight unit tests only. It does not download or run WhisperX models.

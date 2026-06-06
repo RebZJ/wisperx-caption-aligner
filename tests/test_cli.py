@@ -20,3 +20,9 @@ def test_output_modes_canonical_only() -> None:
 def test_output_modes_raw_only() -> None:
     args = parse(["align", "--audio", "a.mp3", "--lyrics", "l.txt", "--out-dir", "out", "--prefix", "song", "--raw"])
     assert selected_outputs(args) == (False, True)
+
+
+def test_editor_defaults_to_overwriting_loaded_captions() -> None:
+    args = parse(["editor", "--audio", "a.mp3", "--captions", "song.captions.json", "--no-open"])
+    assert args.command == "editor"
+    assert args.out is None

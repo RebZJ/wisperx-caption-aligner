@@ -41,3 +41,6 @@ pythonpath = ["src"]
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/wisperx_caption_aligner"]
+
+[tool.hatch.build.targets.wheel.force-include]
+"src/wisperx_caption_aligner/web" = "wisperx_caption_aligner/web"

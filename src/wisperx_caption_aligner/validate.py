@@ -7,7 +7,7 @@ def validate_captions(
     captions: list[dict[str, Any]],
     *,
     expected_words: int | None,
-    max_duration_ms: int,
+    max_duration_ms: int | None,
 ) -> list[str]:
     errors: list[str] = []
 
@@ -24,7 +24,7 @@ def validate_captions(
             errors.append(f"Caption {index} ends before it starts.")
         if index > 0 and start_ms < captions[index - 1]["startMs"]:
             errors.append(f"Caption {index} starts before the previous caption.")
-        if end_ms > max_duration_ms:
+        if max_duration_ms is not None and end_ms > max_duration_ms:
             errors.append(f"Caption {index} ends after {max_duration_ms}ms.")
 
     return errors

@@ -1,0 +1,16 @@
+.DS_Store
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.venv/
+.venv-whisperx/
+__pycache__/
+*.py[cod]
+*.egg-info/
+dist/
+build/
+.cache/
+alignments/
+*.wav
+*.mp3
+*.jsonl
